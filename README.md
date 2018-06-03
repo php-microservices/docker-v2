@@ -1,5 +1,7 @@
 ## Branches = tags in the book
-Instead of using one master branch with the different changes tagged, we will use one brach per old tag.
+Instead of using one master branch with the different changes tagged, we use one brach per old tag. Please note that they are listed in order.
+
+
 - chapter-02
 - main-base-microservices
 - chapter-05-basic-database
