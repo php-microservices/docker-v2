@@ -4,6 +4,7 @@ Instead of using one master branch with the different changes tagged, we will us
 - main-base-microservices
 - chapter-05-basic-database
 - add-redis-container
+- add-cache-layer
 - prometheus-telemetry
 - sentry-installation
 - xdebug-enable
