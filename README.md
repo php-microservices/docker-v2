@@ -3,6 +3,7 @@ Instead of using one master branch with the different changes tagged, we will us
 - chapter-02
 - main-base-microservices
 - chapter-05-basic-database
+- add-redis-container
 - prometheus-telemetry
 - sentry-installation
 - xdebug-enable
