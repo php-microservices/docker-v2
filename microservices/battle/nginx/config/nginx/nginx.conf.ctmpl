@@ -81,4 +81,47 @@ http {
         }
         {{ end }}
     }
+
+    server {
+        listen 443 ssl;
+        server_name  _;
+        root /var/www/html/public;
+        index index.php index.html;
+
+        ssl on;
+        ssl_certificate /etc/nginx/server-cert.pem;
+        ssl_certificate_key /etc/nginx/server-key.pem;
+
+        location = /favicon.ico { access_log off; log_not_found off; }
+        location = /robots.txt  { access_log off; log_not_found off; }
+
+        access_log /var/log/nginx/access.log;
+        error_log  /var/log/nginx/error.log error;
+
+        sendfile off;
+
+        client_max_body_size 100m;
+
+        location / {
+            try_files $uri $uri/ /index.php?_url=$uri&$args;
+        }
+
+        location ~ /\.ht {
+            deny all;
+        }
+
+        {{ if service $backend }}
+        location ~ \.php$ {
+            try_files     $uri =404;
+            fastcgi_split_path_info ^(.+\.php)(/.+)$;
+            fastcgi_pass {{ $backend }};
+            fastcgi_index /index.php;
+            include fastcgi_params;
+            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+            fastcgi_intercept_errors off;
+            fastcgi_buffer_size 16k;
+            fastcgi_buffers 4 16k;
+        }
+        {{ end }}
+    }
 }

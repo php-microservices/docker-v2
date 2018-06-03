@@ -45,6 +45,7 @@ services:
             - BACKEND=microservice-battle-fpm
             - CONSUL=autodiscovery
         ports:
+            - 8443:443
             - 8081:80
             - 9091:9090
 
@@ -127,6 +128,17 @@ services:
             - MYSQL_PASSWORD=mysecret
         ports:
             - 6666:3306
+
+    microservice_secret_database_mariadb:
+        build: ./microservices/secret/mariadb/
+        environment:
+            - CONSUL=autodiscovery
+            - MYSQL_ROOT_PASSWORD=mysecret
+            - MYSQL_DATABASE=finding_secrets
+            - MYSQL_USER=secret
+            - MYSQL_PASSWORD=mysecret
+        ports:
+            - 7777:3306
 
     ##
     # User Microservice
