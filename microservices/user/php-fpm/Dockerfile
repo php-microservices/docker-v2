@@ -6,12 +6,20 @@ RUN apt-get update && apt-get -y install \
     && apt-get autoremove && apt-get autoclean \
     && rm -rf /var/lib/apt/lists/*
 
-RUN pecl install -o -f redis \
+RUN pecl install -o -f redis xdebug\
     &&  rm -rf /tmp/pear \
-    &&  docker-php-ext-enable redis
+    &&  docker-php-ext-enable redis xdebug
 
 RUN echo 'date.timezone="Europe/Madrid"' >>  /usr/local/etc/php/conf.d/date.ini
 RUN echo 'session.save_path = "/tmp"' >>  /usr/local/etc/php/conf.d/session.ini
+
+RUN echo "zend_extension=$(find /usr/local/lib/php/extensions/ -name xdebug.so)\n" >> /usr/local/etc/php/conf.d/xdebug.ini \
+    && echo "xdebug.remote_enable=on\n" >> /usr/local/etc/php/conf.d/xdebug.ini \
+    && echo "xdebug.remote_autostart=off\n" >> /usr/local/etc/php/conf.d/xdebug.ini \
+    && echo "xdebug.remote_port=9000\n" >> /usr/local/etc/php/conf.d/xdebug.ini \
+    && echo "xdebug.profiler_enable=on\n" >> /usr/local/etc/php/conf.d/xdebug.ini \
+    && echo "xdebug.profiler_output_dir=/var/www/html/tmp\n" >> /usr/local/etc/php/conf.d/xdebug.ini \
+    && echo "xdebug.profiler_enable_trigger=on\n" >> /usr/local/etc/php/conf.d/xdebug.ini
 
 ENV CONSUL_TEMPLATE_VERSION 0.16.0
 ENV CONSUL_TEMPLATE_CHECKSUM 064b0b492bb7ca3663811d297436a4bbf3226de706d2b76adade7021cd22e156
@@ -38,6 +46,8 @@ RUN chmod +x /usr/local/bin/reload.sh
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin/ --filename=composer
 
 RUN curl -sSL https://phar.phpunit.de/phpunit.phar -o /usr/bin/phpunit && chmod +x /usr/bin/phpunit
+
+ADD ./config/php.ini /usr/local/etc/php/
 
 CMD [ "/usr/local/bin/containerpilot", \
     "php-fpm", \
