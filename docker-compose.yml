@@ -57,6 +57,7 @@ services:
             - source_location
         links:
             - autodiscovery
+            - microservice_location_redis
         expose:
             - 9000
         environment:
@@ -76,6 +77,16 @@ services:
         ports:
             - 8082:80
             - 9092:9090
+
+    microservice_location_redis:
+        build: ./microservices/location/redis/
+        links:
+            - autodiscovery
+        expose:
+            - 6379
+        ports:
+            - 6380:6379
+
     ##
     # Secret Microservice
     ##
