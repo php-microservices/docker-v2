@@ -181,6 +181,64 @@ services:
             - 9090:9090
 
     ##
+    # Sentry
+    ##
+    sentry_redis:
+        image: redis
+        expose:
+            - 6379
+
+    sentry_postgres:
+        image: postgres
+        environment:
+            - POSTGRES_PASSWORD=sentry
+            - POSTGRES_USER=sentry
+        volumes:
+            - /var/lib/postgresql/data
+        expose:
+            - 5432
+
+    sentry:
+        image: sentry
+        links:
+            - sentry_redis
+            - sentry_postgres
+        ports:
+            - 9876:9000
+        environment:
+            SENTRY_SECRET_KEY: mymicrosecret
+            SENTRY_POSTGRES_HOST: sentry_postgres
+            SENTRY_REDIS_HOST: sentry_redis
+            SENTRY_DB_USER: sentry
+            SENTRY_DB_PASSWORD: sentry
+
+    sentry_celery-beat:
+        image: sentry
+        links:
+            - sentry_redis
+            - sentry_postgres
+        command: sentry celery beat
+        environment:
+            SENTRY_SECRET_KEY: mymicrosecret
+            SENTRY_POSTGRES_HOST: sentry_postgres
+            SENTRY_REDIS_HOST: sentry_redis
+            SENTRY_DB_USER: sentry
+            SENTRY_DB_PASSWORD: sentry
+
+    sentry_celery-worker:
+        image: sentry
+        links:
+            - sentry_redis
+            - sentry_postgres
+        command: sentry celery worker
+        environment:
+            SENTRY_SECRET_KEY: mymicrosecret
+            SENTRY_POSTGRES_HOST: sentry_postgres
+            SENTRY_REDIS_HOST: sentry_redis
+            SENTRY_DB_USER: sentry
+            SENTRY_DB_PASSWORD: sentry
+
+    ##
     # Source containers
     ##
     source_battle:
