@@ -126,6 +126,8 @@ services:
             - source_user
         links:
             - autodiscovery
+            - microservice_secret_nginx
+            - microservice_user_redis
         expose:
             - 9000
         environment:
@@ -145,6 +147,15 @@ services:
         ports:
             - 8084:80
             - 9094:9090
+
+    microservice_user_redis:
+        build: ./microservices/user/redis/
+        links:
+            - autodiscovery
+        expose:
+            - 6379
+        ports:
+            - 6379:6379
     ##
     # Source containers
     ##
