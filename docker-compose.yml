@@ -167,6 +167,19 @@ services:
             - 6379
         ports:
             - 6379:6379
+
+    ##
+    # Telemetry: prometheus
+    ##
+    telemetry:
+        build: ./telemetry/
+        links:
+            - autodiscovery
+        expose:
+            - 9090
+        ports:
+            - 9090:9090
+
     ##
     # Source containers
     ##

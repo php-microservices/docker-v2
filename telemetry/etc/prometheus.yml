@@ -1,0 +1,12 @@
+global:
+  scrape_interval:     15s
+  evaluation_interval: 15s
+  external_labels:
+      monitor: 'codelab-monitor'
+
+scrape_configs:
+- job_name: 'containerpilot-telemetry'
+
+  consul_sd_configs:
+  - server:   'autodiscovery:8500'
+    services: ['containerpilot']
