@@ -1,0 +1,33 @@
+{
+    "consul": "{{ if .CONSUL_AGENT }}localhost{{ else }}{{ .CONSUL }}{{ end }}:8500",
+    "preStart": "/usr/local/bin/reload.sh preStart",
+    "logging": {"level": "DEBUG"},
+    "services": [
+        {
+            "name": "microservice_base_fpm",
+            "port": 80,
+            "health": "/usr/local/sbin/php-fpm -t",
+            "poll": 10,
+            "ttl": 25,
+            "interfaces": ["eth1", "eth0"]
+        }
+    ],
+    "backends": [
+        {
+            "name": "{{ .BACKEND }}",
+            "poll": 7,
+            "onChange": "/usr/local/bin/reload.sh"
+        }
+    ],
+    "coprocesses": [{{ if .CONSUL_AGENT }}
+        {
+            "command": ["/usr/local/bin/consul", "agent",
+                "-data-dir=/var/lib/consul",
+                "-config-dir=/etc/consul",
+                "-rejoin",
+                "-retry-join", "{{ .CONSUL }}",
+                "-retry-max", "10",
+                "-retry-interval", "10s"],
+            "restarts": "unlimited"
+        }{{ end }}]
+}
