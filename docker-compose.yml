@@ -27,6 +27,7 @@ services:
             - source_battle
         links:
             - autodiscovery
+            - microservice_user_nginx
         expose:
             - 9000
         environment:
@@ -84,6 +85,7 @@ services:
             - source_secret
         links:
             - autodiscovery
+            - microservice_secret_database
         expose:
             - 9000
         environment:
@@ -103,6 +105,18 @@ services:
         ports:
             - 8083:80
             - 9093:9090
+
+    microservice_secret_database:
+        build: ./microservices/secret/database/
+        environment:
+            - CONSUL=autodiscovery
+            - MYSQL_ROOT_PASSWORD=mysecret
+            - MYSQL_DATABASE=finding_secrets
+            - MYSQL_USER=secret
+            - MYSQL_PASSWORD=mysecret
+        ports:
+            - 6666:3306
+
     ##
     # User Microservice
     ##

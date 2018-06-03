@@ -2,7 +2,7 @@ FROM php:7.0-fpm
 
 RUN apt-get update && apt-get -y install \
         git g++ libcurl4-gnutls-dev libicu-dev libmcrypt-dev libpq-dev libxml2-dev unzip zlib1g-dev \
-    && docker-php-ext-install curl intl json mbstring mcrypt pdo pdo_pgsql xml \
+    && docker-php-ext-install curl intl json mbstring mcrypt pdo pdo_mysql pdo_pgsql xml \
     && apt-get autoremove && apt-get autoclean \
     && rm -rf /var/lib/apt/lists/*
 
