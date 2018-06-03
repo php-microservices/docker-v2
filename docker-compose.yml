@@ -1,5 +1,8 @@
 version: '2'
 services:
+    ##
+    # Autodiscovery : Consul
+    ##
     autodiscovery:
         build: ./autodiscovery/
         mem_limit: 128m
@@ -15,24 +18,142 @@ services:
         dns:
             - 127.0.0.1
 
-    microservice_base_fpm:
-        build: ./microservices/base/php-fpm/
+    ##
+    # Battle Microservice
+    ##
+    microservice_battle_fpm:
+        build: ./microservices/battle/php-fpm/
+        volumes_from:
+            - source_battle
         links:
             - autodiscovery
         expose:
             - 9000
         environment:
-            - BACKEND=microservice_base_nginx
+            - BACKEND=microservice-battle-nginx
             - CONSUL=autodiscovery
 
-    microservice_base_nginx:
-        build: ./microservices/base/nginx/
+    microservice_battle_nginx:
+        build: ./microservices/battle/nginx/
+        volumes_from:
+            - source_battle
         links:
             - autodiscovery
-            - microservice_base_fpm
+            - microservice_battle_fpm
         environment:
-            - BACKEND=microservice_base_fpm
+            - BACKEND=microservice-battle-fpm
             - CONSUL=autodiscovery
         ports:
-            - 8080:80
-            - 9090:9090
+            - 8081:80
+            - 9091:9090
+
+    ##
+    # Location Microservice
+    ##
+    microservice_location_fpm:
+        build: ./microservices/location/php-fpm/
+        volumes_from:
+            - source_location
+        links:
+            - autodiscovery
+        expose:
+            - 9000
+        environment:
+            - BACKEND=microservice-location-nginx
+            - CONSUL=autodiscovery
+
+    microservice_location_nginx:
+        build: ./microservices/location/nginx/
+        volumes_from:
+            - source_location
+        links:
+            - autodiscovery
+            - microservice_location_fpm
+        environment:
+            - BACKEND=microservice-location-fpm
+            - CONSUL=autodiscovery
+        ports:
+            - 8082:80
+            - 9092:9090
+    ##
+    # Secret Microservice
+    ##
+    microservice_secret_fpm:
+        build: ./microservices/secret/php-fpm/
+        volumes_from:
+            - source_secret
+        links:
+            - autodiscovery
+        expose:
+            - 9000
+        environment:
+            - BACKEND=microservice-secret-nginx
+            - CONSUL=autodiscovery
+
+    microservice_secret_nginx:
+        build: ./microservices/secret/nginx/
+        volumes_from:
+            - source_secret
+        links:
+            - autodiscovery
+            - microservice_secret_fpm
+        environment:
+            - BACKEND=microservice-secret-fpm
+            - CONSUL=autodiscovery
+        ports:
+            - 8083:80
+            - 9093:9090
+    ##
+    # User Microservice
+    ##
+    microservice_user_fpm:
+        build: ./microservices/user/php-fpm/
+        volumes_from:
+            - source_user
+        links:
+            - autodiscovery
+        expose:
+            - 9000
+        environment:
+            - BACKEND=microservice-user-nginx
+            - CONSUL=autodiscovery
+
+    microservice_user_nginx:
+        build: ./microservices/user/nginx/
+        volumes_from:
+            - source_user
+        links:
+            - autodiscovery
+            - microservice_user_fpm
+        environment:
+            - BACKEND=microservice-user-fpm
+            - CONSUL=autodiscovery
+        ports:
+            - 8084:80
+            - 9094:9090
+    ##
+    # Source containers
+    ##
+    source_battle:
+        image: nginx:stable
+        volumes:
+            - ../source/battle:/var/www/html
+        command: "true"
+
+    source_location:
+        image: nginx:stable
+        volumes:
+            - ../source/location:/var/www/html
+        command: "true"
+
+    source_secret:
+        image: nginx:stable
+        volumes:
+            - ../source/secret:/var/www/html
+        command: "true"
+
+    source_user:
+        image: nginx:stable
+        volumes:
+            - ../source/user:/var/www/html
+        command: "true"
